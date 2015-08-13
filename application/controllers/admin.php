@@ -9,6 +9,8 @@ class Admin extends CI_Controller {
         /* Standard Libraries */
         $this->load->database();
         $this->load->helper('url');
+        
+        $this->config->load('custom');
 
         $this->load->library('session');
         $this->load->library('grocery_CRUD');
@@ -38,7 +40,7 @@ class Admin extends CI_Controller {
         $crud->unset_edit_fields('priority');
         
         $crud->set_field_upload('image_url','assets/uploads/files');
-        //$crud->callback_after_upload(array($this,'image_callback_after_upload'));
+        $crud->callback_after_upload(array($this,'image_callback_after_upload'));
         $crud->callback_after_insert(array($this, 'image_callback_after_insert'));
         $crud->callback_before_delete(array($this,'image_callback_before_delete'));
         
@@ -182,27 +184,22 @@ class Admin extends CI_Controller {
     function image_callback_after_upload($uploader_response,$field_info, $files_to_upload)
     {
         $this->load->helper('file');
+        $this->load->helper('image');
         $this->load->library('image_moo');
      
         //Is only one file uploaded so it ok to use it with $uploader_response[0].
         $file_uploaded  = $field_info->upload_path.'/'.$uploader_response[0]->name;
-        $basename       = basename($file_uploaded,".jpg");
-        $file_original  = $field_info->upload_path.'/'.$basename."-original.jpg";
-        $file_large     = $field_info->upload_path.'/'.$basename."-large.jpg";
-        $file_medium    = $field_info->upload_path.'/'.$basename.".jpg";
-        $file_small     = $field_info->upload_path.'/'.$basename."-small.jpg";
-        $file_thumb     = $field_info->upload_path.'/'.$basename."-thumb.jpg";
-        
-        //Copy original file
-        copy($file_uploaded, $file_original);
         
         $this->image_moo->set_jpeg_quality(100);
      
-        // RESIZE large, medium, small, thumb
-        $this->image_moo->load($file_uploaded)->resize(800,800)->save($file_large,true);
-        $this->image_moo->load($file_uploaded)->resize(400,400,false,true)->save($file_medium,true);
-        $this->image_moo->load($file_uploaded)->resize(200,200,false,true)->save($file_small,true);
-        $this->image_moo->load($file_uploaded)->resize(100,100,false,true)->save($file_thumb,true);
+        // RESIZE image versions
+        foreach($this->config->item('image-versions') as $imageversion) {
+            $this->image_moo->load($file_uploaded)->resize(
+                $imageversion['width']
+                ,$imageversion['height']
+                ,false
+                ,$imageversion['sharpen'])->save($field_info->upload_path.'/'.get_image_filename($file_uploaded,$imageversion['version']),true);                  
+        }
      
         return true;
     }
@@ -212,27 +209,21 @@ class Admin extends CI_Controller {
     }
 
     function image_callback_before_delete($primary_key) {
-        $image          = $this->db->get_where('t_image', array('imageid'=>$primary_key), 1)->row_array();
-                
-        // DELETE original, large, small, thumb
-        /*$upload_path    = 'assets/uploads/files/';
-        $file_name      = $image['image_url'];
-        $basename       = basename($file_name,".jpg");
-        $file_original = $upload_path.$basename."-original.jpg";
-        if(file_exists("{$file_original}"))
-            unlink("{$file_original}");
-        $file_large = $upload_path.$basename."-large.jpg";
-        if(file_exists("{$file_large}"))
-            unlink("{$file_large}");
-        $file_medium = $upload_path.$basename.".jpg";
-        if(file_exists("{$file_medium}"))
-            unlink("{$file_medium}");
-        $file_small = $upload_path.$basename."-small.jpg";
-        if(file_exists("{$file_small}"))
-            unlink("{$file_small}");
-        $file_thumb = $upload_path.$basename."-thumb.jpg";
-        if(file_exists("{$file_thumb}"))
-            unlink("{$file_thumb}");*/
+        $this->load->helper('image');
+        
+        $image = $this->db->get_where('t_image', array('imageid'=>$primary_key), 1)->row_array();
+        
+        // DELETE original file
+        $file_original_path = $this->config->item('file-upload-path')."/".$image['image_url'];
+        if(file_exists("{$file_original_path}"))
+            unlink("{$file_original_path}");
+        
+        // DELETE image versions
+        foreach($this->config->item('image-versions') as $imageversion) {
+            $file_version_path = $this->config->item('file-upload-path')."/".get_image_filename($image['image_url'],$imageversion['version']);
+            if(file_exists("{$file_version_path}"))
+                unlink("{$file_version_path}");
+        }
         
         // UPDATE priority of other images of the same exhibition
         $this->db->query("UPDATE t_image SET priority = priority - 1 WHERE priority > ".$image['priority']);

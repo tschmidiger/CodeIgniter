@@ -1460,6 +1460,14 @@ class grocery_CRUD_Model_Driver extends grocery_CRUD_Field_Types
 				if( unlink("{$upload_info->upload_path}/{$state_info->file_name}") )
 				{
 					$this->basic_model->db_file_delete($state_info->field_name, $state_info->file_name);
+                    
+                    // DELETE image versions
+                    $this->ci->load->helper('image');
+                    foreach($this->ci->config->item('image-versions') as $imageversion) {
+                        $file_version_path = $upload_info->upload_path."/".get_image_filename($state_info->file_name,$imageversion['version']);
+                        if(file_exists("{$file_version_path}"))
+                            unlink("{$file_version_path}"); 
+                    }
 
 					return true;
 				}
@@ -3526,7 +3534,8 @@ class Grocery_CRUD extends grocery_CRUD_States
 	 */
 	public function __construct()
 	{
-
+        $this->ci =& get_instance();
+        $this->ci->config->load('custom');
 	}
 
 	/**
@@ -5149,7 +5158,7 @@ class Grocery_CRUD extends grocery_CRUD_States
 		$upload_dir = !empty($upload_dir) && substr($upload_dir,-1,1) == '/'
 						? substr($upload_dir,0,-1)
 						: $upload_dir;
-		$upload_dir = !empty($upload_dir) ? $upload_dir : 'assets/uploads/files';
+		$upload_dir = !empty($upload_dir) ? $upload_dir : $this->ci->config->item('file-upload-path');
 
 		/** Check if the upload Url folder exists. If not then throw an exception **/
 		if (!is_dir(FCPATH.$upload_dir)) {
