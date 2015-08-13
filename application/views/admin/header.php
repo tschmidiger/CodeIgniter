@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin</title>
     <link rel="stylesheet" href="/assets/admin/foundation/stylesheets/app.css" />
-    <script src="/assets/admin/foundation/bower_components/modernizr/modernizr.js"></script>
+    <script src="/assets/admin/foundation/js/modernizr.js"></script>
     <?
     
     if(isset($crud->css_files)) { 
