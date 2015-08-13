@@ -1,0 +1,38 @@
+.flexigrid * {
+    box-sizing:content-box;
+}
+
+.flexigrid .image-thumbnail img {
+  height: 100px;
+}
+
+.flexigrid .pGroup {
+  padding-left: 3px;
+}
+
+.flexigrid input, .flexigrid select {
+    font-size: inherit;
+    width: auto;
+    height: auto;
+    padding: 3px;
+    display: inline-block;
+    margin:0;
+}
+
+select#per_page {
+    padding: 3px 16px 3px 3px;
+}
+
+input#crud_page {
+    padding: 3px;
+    margin-top: 1px;
+}
+
+h1 {
+    font-size:2.0rem;
+    margin-top:rem-calc(14);
+}
+
+.top-bar {
+    border-radius:0 0 rem-calc(7) rem-calc(7);
+}

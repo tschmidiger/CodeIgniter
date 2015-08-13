@@ -28,7 +28,7 @@ class Admin extends CI_Controller {
              ->set_subject('Image')
              ->order_by('priority');
         
-        $crud->columns('image_url','move_up_down','priority');
+        $crud->columns('image_url','move_up_down');
         
         // SORTING drag'n'drop
         $crud->callback_column('move_up_down', array($this, 'populate_up_down'));

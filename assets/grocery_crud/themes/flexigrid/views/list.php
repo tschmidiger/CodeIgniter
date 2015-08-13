@@ -25,8 +25,12 @@
 			</tr>
 		</thead>		
 		<tbody>
-<?php foreach($list as $num_row => $row){ ?>        
-		<tr  <?php if($num_row % 2 == 1){?>class="erow"<?php }?>>
+<?php foreach($list as $num_row => $row){ ?>
+		<tr  <?php if($num_row % 2 == 1){?>class="erow"<?php }?> data_id="<?
+		    // MOD for drag'n'drop sorting
+		    $rowfields = (array)$row; 
+		    echo reset($rowfields); 
+		    ?>">
 			<?php foreach($columns as $column){?>
 			<td width='<?php echo $column_width?>%' class='<?php if(isset($order_by[0]) &&  $column->field_name == $order_by[0]){?>sorted<?php }?>'>
 				<div class='text-left'><?php echo $row->{$column->field_name} != '' ? $row->{$column->field_name} : '&nbsp;' ; ?></div>

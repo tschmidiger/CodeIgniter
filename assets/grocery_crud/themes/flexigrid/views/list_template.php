@@ -1,4 +1,10 @@
 <?php
+    
+    // MOD for drag'n'drop sorting
+    $this->set_css($this->default_css_path.'/ui/simple/'.grocery_CRUD::JQUERY_UI_CSS);
+    $this->set_js($this->default_javascript_path.'/'.grocery_CRUD::JQUERY);
+    $this->set_js($this->default_javascript_path.'/jquery_plugins/ui/'.grocery_CRUD::JQUERY_UI_JS);
+
 	$this->set_css($this->default_theme_path.'/flexigrid/css/flexigrid.css');
 	$this->set_js_lib($this->default_javascript_path.'/'.grocery_CRUD::JQUERY);
 

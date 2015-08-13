@@ -61,6 +61,9 @@ $(function(){
 					 success:    function(data){
 						this_form.closest('.flexigrid').find('.ajax_list').html(data);
 						call_fancybox();
+						// MOD for drag'n'drop sorting
+						if (typeof(makeTableSortable) == "function")
+							makeTableSortable();
 						add_edit_button_listener();
 					 }
 				});
