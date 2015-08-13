@@ -10,7 +10,8 @@
   padding-left: 3px;
 }
 
-.flexigrid input, .flexigrid select {
+.flexigrid .quickSearchBox input, .flexigrid .quickSearchBox select,
+.flexigrid .pDiv2 input, .flexigrid .pDiv2 select {
     font-size: inherit;
     width: auto;
     height: auto;
