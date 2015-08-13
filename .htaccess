@@ -7,3 +7,5 @@ RewriteRule ^(.*)$ http://dev.codeigniter-grocerycrud.ch/$1 [R=301,L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)$ index.php?/$1 [NC,L,QSA]
+
+Options -Indexes
