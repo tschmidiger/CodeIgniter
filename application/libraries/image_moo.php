@@ -500,7 +500,7 @@ class Image_moo
 		return $this;
 	}
 
-	public function resize($mw, $mh, $pad=FALSE)
+	public function resize($mw, $mh, $pad=FALSE, $sharpen=FALSE)
 	//----------------------------------------------------------------------------------------------------------
 	// take main image and resize to tempimage using boundaries mw,mh (max width or max height)
 	// this is proportional, pad to true will set it in the middle of area size
@@ -556,9 +556,28 @@ class Image_moo
 			$bg = imagecolorallocate($this->temp_image, $col[0], $col[1], $col[2]);
 			imagefilledrectangle($this->temp_image, 0, 0, $tx, $ty, $bg);
 		}
+        
+        // copy resized
+        imagecopyresampled($this->temp_image, $this->main_image, $px, $py, 0, 0, $tnw, $tnh, $this->width, $this->height);
+    
+        // sharpen image
+        if($sharpen) {
+            $sharpenMatrix = array
+            (
+                array(-0.7, -0.7, -0.7),
+                array(-0.7, 20, -0.7),
+                array(-0.7, -0.7, -0.7)
+            );
 
-		// copy resized
-		imagecopyresampled($this->temp_image, $this->main_image, $px, $py, 0, 0, $tnw, $tnh, $this->width, $this->height);
+            // calculate the sharpen divisor
+            $divisor = array_sum(array_map('array_sum', $sharpenMatrix));           
+
+            $offset = 0;
+           
+            // apply the matrix
+            imageconvolution($this->temp_image, $sharpenMatrix, $divisor, $offset);
+        }
+		
 		return $this;
 	}
 

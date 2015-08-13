@@ -127,7 +127,7 @@ class grocery_CRUD_Model  extends CI_Model  {
 	    	}
 
     		//Sorry Codeigniter but you cannot help me with the subquery!
-    		$select .= ", (SELECT GROUP_CONCAT(DISTINCT $field) FROM $selection_table "
+    		$select .= ", (SELECT GROUP_CONCAT(DISTINCT $field ORDER BY $relation_table.$priority_field_relation_table) FROM $selection_table "
     			."LEFT JOIN $relation_table ON $relation_table.$primary_key_alias_to_selection_table = $selection_table.$primary_key_selection_table "
     			."WHERE $relation_table.$primary_key_alias_to_this_table = `{$this->table_name}`.$this_table_primary_key GROUP BY $relation_table.$primary_key_alias_to_this_table) AS $field_name";
     	}
